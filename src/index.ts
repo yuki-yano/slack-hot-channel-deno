@@ -1,5 +1,5 @@
-import moment from "https://deno.land/x/momentjs/mod.ts";
-import { delay } from "https://deno.land/std/async/delay.ts";
+import { delay } from "https://deno.land/std@0.93.0/async/delay.ts";
+import moment from "https://deno.land/x/momentjs@2.29.1-deno/mod.ts";
 
 type Conversations = {
   channels: Array<Channel>;
@@ -125,7 +125,7 @@ const fetchHistory = async (channel: Channel) => {
   const messages = data.messages.filter((message) => validMessage(message));
 
   return {
-    messages: messages,
+    messages,
   };
 };
 
