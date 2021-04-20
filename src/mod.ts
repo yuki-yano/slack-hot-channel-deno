@@ -61,6 +61,7 @@ const DEFAULT_HISTORY_OPTIONS = [
 ];
 
 const MOMENT = moment().utcOffset("+9:00").hour(0).minute(0).second(0);
+const DATE = MOMENT.clone().subtract(1, "days").format("YYYY-MM-DD");
 const LATEST = MOMENT.clone().unix().toString();
 const OLDEST = MOMENT.clone().subtract(1, "days").unix().toString();
 
@@ -133,9 +134,7 @@ const dataToRanking = (data: Array<AggregatedData>) => {
     .map((channel) => `- <#${channel.id}> (${channel.messages.length})`)
     .join("\n");
 
-  return `== ${
-    MOMENT.clone().subtract(1, "days").format("YYYY-MM-DD")
-  } の発言数ランキング ==\n${message}`;
+  return `== ${DATE} の発言数ランキング ==\n${message}`;
 };
 
 const postMessage = async (message: string) => {
