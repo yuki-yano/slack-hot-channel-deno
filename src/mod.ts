@@ -32,7 +32,7 @@ const TOKEN = Deno.env.get("TOKEN");
 const BOT_TOKEN = Deno.env.get("BOT_TOKEN");
 const POST_CHANNEL = Deno.env.get("POST_CHANNEL");
 
-const RANKING_COUNT = Deno.env.get("RANKING_COUNT") ?? "20";
+const RANKING_COUNT = Number(Deno.env.get("RANKING_COUNT") ?? "20");
 const USER_NAME = Deno.env.get("USER_NAME") ?? "hot-channel";
 const ICON_EMOJI = Deno.env.get("ICON_EMOJI") ?? ":tada:";
 
@@ -130,7 +130,7 @@ const fetchHistory = async (channel: Channel) => {
 const dataToRanking = (data: Array<AggregatedData>) => {
   const message = data
     .sort((a, b) => b.messages.length - a.messages.length)
-    .slice(0, Number(RANKING_COUNT))
+    .slice(0, RANKING_COUNT)
     .map((channel) => `- <#${channel.id}> (${channel.messages.length})`)
     .join("\n");
 
