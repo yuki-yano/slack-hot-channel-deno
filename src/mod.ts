@@ -33,7 +33,7 @@ const BOT_TOKEN = Deno.env.get("BOT_TOKEN");
 const POST_CHANNEL = Deno.env.get("POST_CHANNEL");
 
 const RANKING_COUNT = Number(Deno.env.get("RANKING_COUNT") ?? "20");
-const USER_NAME = Deno.env.get("USER_NAME") ?? "hot-channel";
+const USER_NAME = Deno.env.get("USER_NAME") ?? "hot-channels";
 const ICON_EMOJI = Deno.env.get("ICON_EMOJI") ?? ":tada:";
 
 const DATE_SWITCHING_HOUR = Number(Deno.env.get("DATE_SWITCHING_HOUR") ?? "4");
