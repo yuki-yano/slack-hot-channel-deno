@@ -40,7 +40,6 @@ const DATE_SWITCHING_HOUR = Number(Deno.env.get("DATE_SWITCHING_HOUR") ?? "4");
 
 const DEFAULT_FETCH_OPTIONS = {
   headers: {
-    "Content-Type": "application/json; charset=utf-8",
     "Authorization": `Bearer ${TOKEN}`,
   },
 };
