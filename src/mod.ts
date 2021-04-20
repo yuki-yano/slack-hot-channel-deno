@@ -36,6 +36,8 @@ const RANKING_COUNT = Number(Deno.env.get("RANKING_COUNT") ?? "20");
 const USER_NAME = Deno.env.get("USER_NAME") ?? "hot-channel";
 const ICON_EMOJI = Deno.env.get("ICON_EMOJI") ?? ":tada:";
 
+const DATE_SWITCHING_HOUR = Number(Deno.env.get("DATE_SWITCHING_HOUR") ?? "4");
+
 const DEFAULT_FETCH_OPTIONS = {
   headers: {
     "Content-Type": "application/json; charset=utf-8",
@@ -60,7 +62,8 @@ const DEFAULT_HISTORY_OPTIONS = [
   "limit=1000",
 ];
 
-const MOMENT = moment().utcOffset("+9:00").hour(0).minute(0).second(0);
+const MOMENT = moment().utcOffset("+9:00").hour(DATE_SWITCHING_HOUR).minute(0)
+  .second(0);
 const DATE = MOMENT.clone().subtract(1, "days").format("YYYY-MM-DD");
 const LATEST = MOMENT.clone().unix().toString();
 const OLDEST = MOMENT.clone().subtract(1, "days").unix().toString();
