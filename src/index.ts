@@ -29,8 +29,14 @@ type AggregatedData = {
 };
 
 const TOKEN = Deno.env.get("TOKEN");
-const BOT_TOKEN = Deno.env.get("BOT_TOKEN");
+const BOT_TOKEN = Deno.env.get("BOT_TOKEN") ?? TOKEN;
 const POST_CHANNEL = Deno.env.get("POST_CHANNEL");
+
+if (TOKEN == null || BOT_TOKEN == null || POST_CHANNEL == null) {
+  console.error("Environment variable is not set");
+
+  Deno.exit(1);
+}
 
 const RANKING_COUNT = Number(Deno.env.get("RANKING_COUNT") ?? "20");
 const USER_NAME = Deno.env.get("USER_NAME") ?? "hot-channels";
