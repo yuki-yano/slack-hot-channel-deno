@@ -135,6 +135,15 @@ const fetchHistory = async (channel: Channel) => {
   };
 };
 
+const dataToMessageCount = (data: Array<AggregatedData>) => {
+  let count = 0;
+  for (const v of data) {
+    count += v.messages.length;
+  }
+
+  return `合計発言数: ${count.toString()}\n\n`;
+};
+
 const dataToRanking = (data: Array<AggregatedData>) => {
   const message = data
     .sort((a, b) => b.messages.length - a.messages.length)
@@ -142,7 +151,7 @@ const dataToRanking = (data: Array<AggregatedData>) => {
     .map((channel) => `- <#${channel.id}> (${channel.messages.length})`)
     .join("\n");
 
-  return `== ${DATE} の発言数ランキング ==\n${message}`;
+  return message;
 };
 
 const postMessage = async (message: string) => {
@@ -181,7 +190,10 @@ const main = async () => {
     i++;
   }
 
-  const message = dataToRanking(data);
+  const header = `== ${DATE} の発言数ランキング ==\n`
+  const messageCount = dataToMessageCount(data);
+  const ranking = dataToRanking(data);
+  const message = `${header}${messageCount}${ranking}`;
   console.log(message);
   postMessage(message);
 };
