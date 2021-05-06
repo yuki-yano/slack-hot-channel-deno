@@ -146,6 +146,7 @@ const dataToMessageCount = (data: Array<AggregatedData>) => {
 
 const dataToRanking = (data: Array<AggregatedData>) => {
   const message = data
+    .filter((channel) => channel.messages.length !== 0)
     .sort((a, b) => b.messages.length - a.messages.length)
     .slice(0, RANKING_COUNT)
     .map((channel) => `- <#${channel.id}> (${channel.messages.length})`)
