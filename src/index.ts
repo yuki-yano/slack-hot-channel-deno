@@ -191,7 +191,7 @@ const main = async () => {
     i++;
   }
 
-  const header = `== ${DATE} の発言数ランキング ==\n`
+  const header = `== ${DATE} の発言数ランキング ==\n`;
   const messageCount = dataToMessageCount(data);
   const ranking = dataToRanking(data);
   const message = `${header}${messageCount}${ranking}`;
