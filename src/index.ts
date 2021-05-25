@@ -167,9 +167,9 @@ const postMessage = async ({
   attachmentText,
   attachmentFields,
 }: {
-  attachmentTitle: string,
-  attachmentText: string,
-  attachmentFields: AttachmentField[],
+  attachmentTitle: string;
+  attachmentText: string;
+  attachmentFields: AttachmentField[];
 }) => {
   const body = {
     channel: POST_CHANNEL,
@@ -219,7 +219,7 @@ const main = async () => {
   const attachmentText = dataToMessageCount(data);
   const attachmentFields = dataToAttachmentFields(data);
   console.log({ attachmentTitle, attachmentText, attachmentFields });
-  postMessage({attachmentTitle, attachmentText, attachmentFields });
+  postMessage({ attachmentTitle, attachmentText, attachmentFields });
 };
 
 main();
