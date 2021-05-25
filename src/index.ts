@@ -150,17 +150,6 @@ const dataToMessageCount = (data: Array<AggregatedData>) => {
   return `合計発言数: ${count.toString()}\n\n`;
 };
 
-const dataToRanking = (data: Array<AggregatedData>) => {
-  const message = data
-    .filter((channel) => channel.messages.length !== 0)
-    .sort((a, b) => b.messages.length - a.messages.length)
-    .slice(0, RANKING_COUNT)
-    .map((channel) => `- <#${channel.id}> (${channel.messages.length})`)
-    .join("\n");
-
-  return message;
-};
-
 const dataToAttachmentFields = (
   data: Array<AggregatedData>,
 ): AttachmentField[] => {
@@ -173,18 +162,24 @@ const dataToAttachmentFields = (
     }));
 };
 
-const postMessage = async (
-  message: string,
+const postMessage = async ({
+  attachmentTitle,
+  attachmentText,
+  attachmentFields,
+}: {
+  attachmentTitle: string,
+  attachmentText: string,
   attachmentFields: AttachmentField[],
-) => {
+}) => {
   const body = {
     channel: POST_CHANNEL,
     username: USER_NAME,
     icon_emoji: ICON_EMOJI,
-    text: message,
     attachments: [
       {
         color: "#95B88F", // vim-jp icon's bg color
+        title: attachmentTitle,
+        text: attachmentText,
         fields: attachmentFields,
       },
     ],
@@ -218,13 +213,11 @@ const main = async () => {
     i++;
   }
 
-  const header = `== ${DATE} の発言数ランキング ==\n`;
-  const messageCount = dataToMessageCount(data);
-  const ranking = dataToRanking(data);
-  const message = `${header}${messageCount}${ranking}`;
+  const attachmentTitle = `== ${DATE} の発言数ランキング ==\n`;
+  const attachmentText = dataToMessageCount(data);
   const attachmentFields = dataToAttachmentFields(data);
-  console.log(message);
-  postMessage(message, attachmentFields);
+  console.log({ attachmentTitle, attachmentText, attachmentFields });
+  postMessage({attachmentTitle, attachmentText, attachmentFields });
 };
 
 main();
