@@ -147,7 +147,7 @@ const dataToMessageCount = (data: Array<AggregatedData>) => {
     count += v.messages.length;
   }
 
-  return `合計発言数: ${count.toString()}\n\n`;
+  return `合計発言数: ${count.toString()}`;
 };
 
 const dataToAttachmentFields = (
@@ -213,7 +213,7 @@ const main = async () => {
     i++;
   }
 
-  const attachmentTitle = `== ${DATE} の発言数ランキング ==\n`;
+  const attachmentTitle = `${DATE} の発言数ランキング`;
   const attachmentText = dataToMessageCount(data);
   const attachmentFields = dataToAttachmentFields(data);
   console.log({ attachmentTitle, attachmentText, attachmentFields });
