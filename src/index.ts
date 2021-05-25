@@ -178,6 +178,8 @@ const postMessage = async ({
     attachments: [
       {
         color: "#95B88F", // vim-jp icon's bg color
+        author_name: "slack-hot-channel-deno",
+        author_link: "https://github.com/yuki-yano/slack-hot-channel-deno",
         title: attachmentTitle,
         text: attachmentText,
         fields: attachmentFields,
