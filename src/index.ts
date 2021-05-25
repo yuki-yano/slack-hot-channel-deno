@@ -28,6 +28,12 @@ type AggregatedData = {
   messages: Array<Message>;
 };
 
+type AttachmentField = {
+  title?: string;
+  value?: string;
+  short?: boolean;
+};
+
 const TOKEN = Deno.env.get("TOKEN");
 const BOT_TOKEN = Deno.env.get("BOT_TOKEN") ?? TOKEN;
 const POST_CHANNEL = Deno.env.get("POST_CHANNEL");
@@ -155,12 +161,33 @@ const dataToRanking = (data: Array<AggregatedData>) => {
   return message;
 };
 
-const postMessage = async (message: string) => {
+const dataToAttachmentFields = (
+  data: Array<AggregatedData>,
+): AttachmentField[] => {
+  return data
+    .filter((channel) => channel.messages.length !== 0)
+    .sort((a, b) => b.messages.length - a.messages.length)
+    .slice(0, RANKING_COUNT)
+    .map((channel, i) => ({
+      value: `#${i + 1} <#${channel.id}> (${channel.messages.length})`,
+    }));
+};
+
+const postMessage = async (
+  message: string,
+  attachmentFields: AttachmentField[],
+) => {
   const body = {
     channel: POST_CHANNEL,
     username: USER_NAME,
     icon_emoji: ICON_EMOJI,
     text: message,
+    attachments: [
+      {
+        color: "#95B88F", // vim-jp icon's bg color
+        fields: attachmentFields,
+      },
+    ],
   };
 
   const options = {
@@ -195,8 +222,9 @@ const main = async () => {
   const messageCount = dataToMessageCount(data);
   const ranking = dataToRanking(data);
   const message = `${header}${messageCount}${ranking}`;
+  const attachmentFields = dataToAttachmentFields(data);
   console.log(message);
-  postMessage(message);
+  postMessage(message, attachmentFields);
 };
 
 main();
