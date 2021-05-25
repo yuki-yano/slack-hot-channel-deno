@@ -141,13 +141,13 @@ const fetchHistory = async (channel: Channel) => {
   };
 };
 
-const dataToMessageCount = (data: Array<AggregatedData>) => {
+const countSumOfMessages = (data: Array<AggregatedData>) => {
   let count = 0;
   for (const v of data) {
     count += v.messages.length;
   }
 
-  return `合計発言数: ${count.toString()}`;
+  return count;
 };
 
 const dataToAttachmentFields = (
@@ -215,8 +215,9 @@ const main = async () => {
     i++;
   }
 
+  const sumOfMessages = countSumOfMessages(data);
   const attachmentTitle = `${DATE} の発言数ランキング`;
-  const attachmentText = dataToMessageCount(data);
+  const attachmentText = `合計発言数: ${sumOfMessages.toString()}`;
   const attachmentFields = dataToAttachmentFields(data);
   console.log({ attachmentTitle, attachmentText, attachmentFields });
   postMessage({ attachmentTitle, attachmentText, attachmentFields });
