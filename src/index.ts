@@ -150,15 +150,24 @@ const countSumOfMessages = (data: Array<AggregatedData>) => {
   return count;
 };
 
+const calcRatioPercentage = (count: number, sum: number) => {
+  const result = Math.floor(count / sum * 100);
+  return `${result}%`;
+};
+
 const dataToAttachmentFields = (
   data: Array<AggregatedData>,
+  sumOfMessages: number,
 ): AttachmentField[] => {
   return data
     .filter((channel) => channel.messages.length !== 0)
     .sort((a, b) => b.messages.length - a.messages.length)
     .slice(0, RANKING_COUNT)
     .map((channel, i) => ({
-      value: `#${i + 1} <#${channel.id}> (${channel.messages.length})`,
+      title: `#${i + 1} (${
+        calcRatioPercentage(channel.messages.length, sumOfMessages)
+      })`,
+      value: `<#${channel.id}> / 発言数: ${channel.messages.length}`,
     }));
 };
 
@@ -218,7 +227,7 @@ const main = async () => {
   const sumOfMessages = countSumOfMessages(data);
   const attachmentTitle = `${DATE} の発言数ランキング`;
   const attachmentText = `合計発言数: ${sumOfMessages.toString()}`;
-  const attachmentFields = dataToAttachmentFields(data);
+  const attachmentFields = dataToAttachmentFields(data, sumOfMessages);
   console.log({ attachmentTitle, attachmentText, attachmentFields });
   postMessage({ attachmentTitle, attachmentText, attachmentFields });
 };
