@@ -47,6 +47,7 @@ if (TOKEN == null || BOT_TOKEN == null || POST_CHANNEL == null) {
 const RANKING_COUNT = Number(Deno.env.get("RANKING_COUNT") ?? "20");
 const USER_NAME = Deno.env.get("USER_NAME") ?? "hot-channels";
 const ICON_EMOJI = Deno.env.get("ICON_EMOJI") ?? ":tada:";
+const COLOR = Deno.env.get("COLOR") ?? "#95B88F";
 
 const DATE_SWITCHING_HOUR = Number(Deno.env.get("DATE_SWITCHING_HOUR") ?? "4");
 
@@ -186,7 +187,7 @@ const postMessage = async ({
     icon_emoji: ICON_EMOJI,
     attachments: [
       {
-        color: "#95B88F",
+        color: COLOR,
         author_name: "slack-hot-channel-deno",
         author_link: "https://github.com/yuki-yano/slack-hot-channel-deno",
         title: attachmentTitle,
