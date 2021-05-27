@@ -188,7 +188,7 @@ const postMessage = async ({
     attachments: [
       {
         color: COLOR,
-        author_name: "slack-hot-channel-deno",
+        author_name: "Hot Channels Bot",
         author_link: "https://github.com/yuki-yano/slack-hot-channel-deno",
         title: attachmentTitle,
         text: attachmentText,
