@@ -165,7 +165,7 @@ const dataToAttachmentFields = (
     .sort((a, b) => b.messages.length - a.messages.length)
     .slice(0, RANKING_COUNT)
     .map((channel, i) => ({
-      value: `#${i + 1} <#${channel.id}> / 発言数: ${channel.messages.length} (${
+      value: `${i + 1}. <#${channel.id}> / 発言数: ${channel.messages.length} (${
         calcRatioPercentage(channel.messages.length, sumOfMessages)
       })`,
     }));
