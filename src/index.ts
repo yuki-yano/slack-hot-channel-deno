@@ -152,7 +152,7 @@ const countSumOfMessages = (data: Array<AggregatedData>) => {
 };
 
 const calcRatioPercentage = (count: number, sum: number) => {
-  const result = Math.floor(count / sum * 100);
+  const result = (count / sum * 100).toFixed(1);
   return `${result}%`;
 };
 
