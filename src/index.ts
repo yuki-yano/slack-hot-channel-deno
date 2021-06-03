@@ -34,6 +34,15 @@ type AttachmentField = {
   short?: boolean;
 };
 
+type Ranking = {
+  channel: AggregatedData;
+  rank: number;
+};
+
+type RankingDiff = Ranking & {
+  diff: number;
+};
+
 const TOKEN = Deno.env.get("TOKEN");
 const BOT_TOKEN = Deno.env.get("BOT_TOKEN") ?? TOKEN;
 const POST_CHANNEL = Deno.env.get("POST_CHANNEL");
@@ -77,8 +86,10 @@ const DEFAULT_HISTORY_OPTIONS = [
 const MOMENT = moment().utcOffset("+9:00").hour(DATE_SWITCHING_HOUR).minute(0)
   .second(0);
 const DATE = MOMENT.clone().subtract(1, "days").format("YYYY-MM-DD");
-const LATEST = MOMENT.clone().unix().toString();
-const OLDEST = MOMENT.clone().subtract(1, "days").unix().toString();
+const TODAY_LATEST = MOMENT.clone().unix().toString();
+const TODAY_OLDEST = MOMENT.clone().subtract(1, "days").unix().toString();
+const YESTERDAY_LATEST = MOMENT.clone().subtract(1, "days").unix().toString();
+const YESTERDAY_OLDEST = MOMENT.clone().subtract(2, "days").unix().toString();
 
 const fetchChannels = async () => {
   let channels: Array<Channel> = [];
@@ -119,12 +130,16 @@ const validMessage = (message: Message) => {
   return false;
 };
 
-const fetchHistory = async (channel: Channel) => {
+const fetchHistory = async (
+  channel: Channel,
+  oldest: string,
+  latest: string,
+) => {
   const urlOptions = [
     ...DEFAULT_HISTORY_OPTIONS,
     `channel=${channel.id}`,
-    `oldest=${OLDEST}`,
-    `latest=${LATEST}`,
+    `oldest=${oldest}`,
+    `latest=${latest}`,
   ].join("&");
 
   const result = await fetch(
@@ -156,16 +171,50 @@ const calcRatioPercentage = (count: number, sum: number) => {
   return `${result}%`;
 };
 
+const calcRankingDiff = (
+  { todayRanking, yesterdayRanking }: {
+    todayRanking: Array<Ranking>;
+    yesterdayRanking: Array<Ranking>;
+  },
+): Array<RankingDiff> => {
+  let data: Array<RankingDiff> = [];
+
+  for (const { channel, rank } of todayRanking) {
+    const yesterdayRank = yesterdayRanking.find((
+      { channel: yesterdayChannel },
+    ) => yesterdayChannel.id === channel.id);
+
+    if (yesterdayRank == null) {
+      data = [...data, { channel, rank, diff: 0 }];
+    } else {
+      data = [...data, { channel, rank, diff: yesterdayRank.rank - rank }];
+    }
+  }
+
+  return data;
+};
+
+const diffToString = (diff: number) => {
+  if (diff === 0) {
+    return `:arrow_right:`;
+  } else if (diff > 0) {
+    return `:arrow_up: +${diff}`;
+  } else if (diff < 0) {
+    return `:arrow_down: ${diff}`;
+  }
+};
+
 const dataToAttachmentFields = (
-  data: Array<AggregatedData>,
+  rankingData: Array<RankingDiff>,
   sumOfMessages: number,
 ): AttachmentField[] => {
-  return data
-    .filter((channel) => channel.messages.length !== 0)
-    .sort((a, b) => b.messages.length - a.messages.length)
+  return rankingData
+    .filter(({ channel }) => channel.messages.length !== 0)
     .slice(0, RANKING_COUNT)
-    .map((channel, i) => ({
-      value: `${i + 1}. <#${channel.id}> / 発言数: ${channel.messages.length} (${
+    .map(({ channel, rank, diff }) => ({
+      value: `${rank}. <#${channel.id}> ${
+        diffToString(diff)
+      } / 発言数: ${channel.messages.length} (${
         calcRatioPercentage(channel.messages.length, sumOfMessages)
       })`,
     }));
@@ -204,14 +253,20 @@ const postMessage = async ({
   return await fetch(`https://slack.com/api/chat.postMessage`, options);
 };
 
-const main = async () => {
-  const channels = await fetchChannels();
+const getData = async (
+  { channels, oldest, latest, day }: {
+    channels: Array<Channel>;
+    oldest: string;
+    latest: string;
+    day: string;
+  },
+) => {
   let data: Array<AggregatedData> = [];
 
   let i = 1;
   for (const channel of channels) {
-    console.log(`fetch [${i}/${channels.length}]: ${channel.name}`);
-    const history = await fetchHistory(channel);
+    console.log(`fetch ${day} [${i}/${channels.length}]: ${channel.name}`);
+    const history = await fetchHistory(channel, oldest, latest);
     const aggregated: AggregatedData = {
       id: channel.id,
       name: channel.name,
@@ -224,10 +279,47 @@ const main = async () => {
     i++;
   }
 
-  const sumOfMessages = countSumOfMessages(data);
+  return data;
+};
+
+const calcRankingOfDay = (data: Array<AggregatedData>): Array<Ranking> => {
+  return data
+    .sort((a, b) => b.messages.length - a.messages.length)
+    .map((channel, i) => ({
+      channel,
+      rank: i + 1,
+    }));
+};
+
+const main = async () => {
+  const channels = await fetchChannels();
+
+  const todayData = await getData(
+    { channels, oldest: TODAY_OLDEST, latest: TODAY_LATEST, day: "today" },
+  );
+  const yesterdayData = await getData(
+    {
+      channels,
+      oldest: YESTERDAY_OLDEST,
+      latest: YESTERDAY_LATEST,
+      day: "yesterday",
+    },
+  );
+
+  const todayRanking: Array<Ranking> = calcRankingOfDay(todayData);
+  const yesterdayRanking: Array<Ranking> = calcRankingOfDay(yesterdayData);
+
+  const rankingData: Array<RankingDiff> = calcRankingDiff(
+    { yesterdayRanking, todayRanking },
+  );
+
+  const sumOfMessages = countSumOfMessages(todayData);
   const attachmentTitle = `${DATE} の発言数ランキング`;
   const attachmentText = `合計発言数: ${sumOfMessages.toString()}`;
-  const attachmentFields = dataToAttachmentFields(data, sumOfMessages);
+  const attachmentFields = dataToAttachmentFields(
+    rankingData,
+    sumOfMessages,
+  );
   console.log({ attachmentTitle, attachmentText, attachmentFields });
   postMessage({ attachmentTitle, attachmentText, attachmentFields });
 };
