@@ -67,6 +67,7 @@ export const fetchChannels = async (): Promise<Array<Channel>> => {
       },
     );
 
+    // deno-lint-ignore camelcase
     const { channels: fetchChannels, response_metadata: { next_cursor } } =
       (await result.json()) as Conversations;
 
@@ -112,6 +113,7 @@ export const postMessage = async ({
   const body = {
     channel: POST_CHANNEL,
     username: USER_NAME,
+    // deno-lint-ignore camelcase
     icon_emoji: ICON_EMOJI,
     attachments: [
       {
