@@ -283,12 +283,24 @@ const getData = async (
 };
 
 const calcRankingOfDay = (data: Array<AggregatedData>): Array<Ranking> => {
+  let prevMessageCount: number;
+  let prevRank: number;
+
   return data
     .sort((a, b) => b.messages.length - a.messages.length)
-    .map((channel, i) => ({
-      channel,
-      rank: i + 1,
-    }));
+    .map((channel, i) => {
+      const rank = channel.messages.length === prevMessageCount
+        ? prevRank
+        : i + 1;
+
+      prevMessageCount = channel.messages.length;
+      prevRank = rank;
+
+      return {
+        channel,
+        rank,
+      };
+    });
 };
 
 const main = async () => {
