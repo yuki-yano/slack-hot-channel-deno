@@ -1,5 +1,10 @@
 import { AggregatedData, Ranking, RankingDiff } from "../type/data.ts";
 import { AttachmentField } from "../type/slack.ts";
+import {
+  RANKING_DOWNTREND_EMOJI,
+  RANKING_SIDEWAYTREND_EMOJI,
+  RANKING_UPTREND_EMOJI,
+} from "../env.ts";
 
 export const calcRankingDiff = (
   { todayRanking, yesterdayRanking }: {
@@ -91,11 +96,11 @@ const calcRatioPercentage = (count: number, sum: number): string => {
 
 const diffToString = (diff: number): string => {
   if (diff === 0) {
-    return `:arrow_right:`;
+    return RANKING_SIDEWAYTREND_EMOJI;
   } else if (diff > 0) {
-    return `:arrow_up: +${diff}`;
+    return `${RANKING_UPTREND_EMOJI} +${diff}`;
   } else if (diff < 0) {
-    return `:arrow_down: ${diff}`;
+    return `${RANKING_DOWNTREND_EMOJI} ${diff}`;
   }
 
   throw new Error("Unexpected diff");

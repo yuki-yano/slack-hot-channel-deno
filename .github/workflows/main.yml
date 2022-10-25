@@ -17,4 +17,9 @@ jobs:
       - run: deno test --no-run src/**/*.ts
       - run: deno lint
       - run: deno fmt --check
-      - run: deno test
+      - run: deno test --allow-env
+        env:
+          TOKEN: dummy-token
+          BOT_TOKEN: dummy-bot-token
+          POST_CHANNEL: dummy-post-channel
+
