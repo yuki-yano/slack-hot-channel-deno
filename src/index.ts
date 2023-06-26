@@ -11,11 +11,16 @@ import {
   YESTERDAY_LATEST,
   YESTERDAY_OLDEST,
 } from "./const/date.ts";
+import { getSettings } from "./settings.ts";
 import { fetchChannels, getData, postMessage } from "./slack/index.ts";
 import type { Ranking, RankingDiff } from "./type/data.ts";
 
 const main = async (): Promise<void> => {
-  const channels = await fetchChannels();
+  const settings = await getSettings();
+
+  const channels = (await fetchChannels()).filter((channel) =>
+    !settings.excludes?.some((exclude) => exclude.test(channel.name))
+  );
 
   const todayData = await getData(
     { channels, oldest: TODAY_OLDEST, latest: TODAY_LATEST, day: "today" },
