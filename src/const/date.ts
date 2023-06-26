@@ -1,14 +1,31 @@
 import { moment } from "../deps.ts";
-import { DATE_SWITCHING_HOUR } from "../env.ts";
+import { getDefaultSettings, getSettings } from "../settings.ts";
 
-export const MOMENT = moment().utcOffset("+9:00").hour(DATE_SWITCHING_HOUR)
-  .minute(0)
-  .second(0);
-export const DATE = MOMENT.clone().subtract(1, "days").format("YYYY-MM-DD");
-export const TODAY_LATEST = MOMENT.clone().unix().toString();
-export const TODAY_OLDEST = MOMENT.clone().subtract(1, "days").unix()
+const getMoment = async () => {
+  try {
+    const { date_switching_hour } = await getSettings();
+    return moment().utcOffset("+9:00").hour(date_switching_hour)
+      .minute(0)
+      .second(0);
+  } catch (_) {
+    return moment().utcOffset("+9:00").hour(
+      getDefaultSettings().date_switching_hour,
+    )
+      .minute(0)
+      .second(0);
+  }
+};
+
+export const DATE = (await getMoment()).clone().subtract(1, "days").format(
+  "YYYY-MM-DD",
+);
+export const TODAY_LATEST = (await getMoment()).clone().unix().toString();
+export const TODAY_OLDEST = (await getMoment()).clone().subtract(1, "days")
+  .unix()
   .toString();
-export const YESTERDAY_LATEST = MOMENT.clone().subtract(1, "days").unix()
+export const YESTERDAY_LATEST = (await getMoment()).clone().subtract(1, "days")
+  .unix()
   .toString();
-export const YESTERDAY_OLDEST = MOMENT.clone().subtract(2, "days").unix()
+export const YESTERDAY_OLDEST = (await getMoment()).clone().subtract(2, "days")
+  .unix()
   .toString();

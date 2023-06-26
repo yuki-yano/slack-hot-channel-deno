@@ -1,10 +1,6 @@
+import { Settings } from "../settings.ts";
 import { AggregatedData, Ranking, RankingDiff } from "../type/data.ts";
 import { AttachmentField } from "../type/slack.ts";
-import {
-  RANKING_DOWNTREND_EMOJI,
-  RANKING_SIDEWAYTREND_EMOJI,
-  RANKING_UPTREND_EMOJI,
-} from "../env.ts";
 
 export const calcRankingDiff = (
   { todayRanking, yesterdayRanking }: {
@@ -34,9 +30,10 @@ export const formatAttachmentFieldValue = (
     rankingDiff: RankingDiff;
     sumOfMessages: number;
   },
+  settings: Settings,
 ) => {
   return `${rank}. <#${channel.id}> ${
-    diffToString(diff)
+    diffToString(diff, settings)
   } / 発言数: ${channel.messages.length} (${
     calcRatioPercentage(channel.messages.length, sumOfMessages)
   })`;
@@ -45,11 +42,15 @@ export const formatAttachmentFieldValue = (
 export const dataToAttachmentFields = (
   rankingData: Array<RankingDiff>,
   sumOfMessages: number,
+  settings: Settings,
 ): Array<AttachmentField> => {
   return rankingData
     .filter(({ channel }) => channel.messages.length !== 0)
     .map((rankingDiff) => ({
-      value: formatAttachmentFieldValue({ rankingDiff, sumOfMessages }),
+      value: formatAttachmentFieldValue(
+        { rankingDiff, sumOfMessages },
+        settings,
+      ),
     }));
 };
 
@@ -94,13 +95,20 @@ const calcRatioPercentage = (count: number, sum: number): string => {
   return `${result}%`;
 };
 
-const diffToString = (diff: number): string => {
+const diffToString = (
+  diff: number,
+  {
+    ranking_sidewaytrend_emoji,
+    ranking_uptrend_emoji,
+    ranking_downtrend_emoji,
+  }: Settings,
+): string => {
   if (diff === 0) {
-    return RANKING_SIDEWAYTREND_EMOJI;
+    return ranking_sidewaytrend_emoji;
   } else if (diff > 0) {
-    return `${RANKING_UPTREND_EMOJI} +${diff}`;
+    return `${ranking_uptrend_emoji} +${diff}`;
   } else if (diff < 0) {
-    return `${RANKING_DOWNTREND_EMOJI} ${diff}`;
+    return `${ranking_downtrend_emoji} ${diff}`;
   }
 
   throw new Error("Unexpected diff");

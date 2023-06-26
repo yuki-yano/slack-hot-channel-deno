@@ -1,13 +1,16 @@
 import { formatAttachmentFieldValue } from "./index.ts";
 import { RankingDiff } from "../type/data.ts";
 import { assertEquals } from "https://deno.land/std@0.65.0/testing/asserts.ts";
-import {
-  RANKING_DOWNTREND_EMOJI,
-  RANKING_SIDEWAYTREND_EMOJI,
-  RANKING_UPTREND_EMOJI,
-} from "../env.ts";
+import { getDefaultSettings } from "../settings.ts";
 
 Deno.test("formatAttachmentFieldValue", () => {
+  const settings = getDefaultSettings();
+  const {
+    ranking_sidewaytrend_emoji,
+    ranking_uptrend_emoji,
+    ranking_downtrend_emoji,
+  } = settings;
+
   const rankDiffTemplate: RankingDiff = {
     channel: {
       id: "dummy-id",
@@ -28,8 +31,8 @@ Deno.test("formatAttachmentFieldValue", () => {
     formatAttachmentFieldValue({
       rankingDiff: rankDiffTemplate,
       sumOfMessages: 10,
-    }),
-    `1. <#dummy-id> ${RANKING_UPTREND_EMOJI} +3 / 発言数: 1 (10.0%)`,
+    }, settings),
+    `1. <#dummy-id> ${ranking_uptrend_emoji} +3 / 発言数: 1 (10.0%)`,
   );
 
   // down trend
@@ -37,8 +40,8 @@ Deno.test("formatAttachmentFieldValue", () => {
     formatAttachmentFieldValue({
       rankingDiff: { ...rankDiffTemplate, diff: -2 },
       sumOfMessages: 10,
-    }),
-    `1. <#dummy-id> ${RANKING_DOWNTREND_EMOJI} -2 / 発言数: 1 (10.0%)`,
+    }, settings),
+    `1. <#dummy-id> ${ranking_downtrend_emoji} -2 / 発言数: 1 (10.0%)`,
   );
 
   // sideways trend
@@ -46,7 +49,7 @@ Deno.test("formatAttachmentFieldValue", () => {
     formatAttachmentFieldValue({
       rankingDiff: { ...rankDiffTemplate, diff: 0 },
       sumOfMessages: 10,
-    }),
-    `1. <#dummy-id> ${RANKING_SIDEWAYTREND_EMOJI} / 発言数: 1 (10.0%)`,
+    }, settings),
+    `1. <#dummy-id> ${ranking_sidewaytrend_emoji} / 発言数: 1 (10.0%)`,
   );
 });

@@ -19,7 +19,7 @@ const main = async (): Promise<void> => {
   const settings = await getSettings();
 
   const channels = (await fetchChannels()).filter((channel) =>
-    !settings.excludes?.some((exclude) => exclude.test(channel.name))
+    !settings.exclude_channels.some((exclude) => exclude.test(channel.name))
   );
 
   const todayData = await getData(
@@ -47,9 +47,10 @@ const main = async (): Promise<void> => {
   const attachmentFields = dataToAttachmentFields(
     rankingData,
     sumOfMessages,
+    settings,
   );
   console.log({ attachmentTitle, attachmentText, attachmentFields });
-  postMessage({ attachmentTitle, attachmentText, attachmentFields });
+  postMessage({ attachmentTitle, attachmentText, attachmentFields }, settings);
 };
 
 main();
