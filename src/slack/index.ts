@@ -5,13 +5,7 @@ import {
   DEFAULT_POST_OPTIONS,
 } from "../const/slack.ts";
 import { delay } from "../deps.ts";
-import {
-  COLOR,
-  ICON_EMOJI,
-  POST_CHANNEL,
-  RANKING_COUNT,
-  USER_NAME,
-} from "../env.ts";
+import { Settings } from "../settings.ts";
 import type { AggregatedData } from "../type/data.ts";
 import type {
   Channel,
@@ -105,24 +99,27 @@ export const fetchHistory = async (
   };
 };
 
-export const postMessage = async ({
-  attachmentTitle,
-  attachmentText,
-  attachmentFields,
-}: PostData): Promise<void> => {
+export const postMessage = async (
+  {
+    attachmentTitle,
+    attachmentText,
+    attachmentFields,
+  }: PostData,
+  { post_channel, user_name, icon_emoji, color, ranking_count }: Settings,
+): Promise<void> => {
   const body = {
-    channel: POST_CHANNEL,
-    username: USER_NAME,
+    channel: post_channel,
+    username: user_name,
     // deno-lint-ignore camelcase
-    icon_emoji: ICON_EMOJI,
+    icon_emoji: icon_emoji,
     attachments: [
       {
-        color: COLOR,
+        color: color,
         author_name: "Hot Channels Bot",
         author_link: "https://github.com/yuki-yano/slack-hot-channel-deno",
         title: attachmentTitle,
         text: attachmentText,
-        fields: attachmentFields.slice(0, RANKING_COUNT),
+        fields: attachmentFields.slice(0, ranking_count),
       },
     ],
   };
