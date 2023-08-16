@@ -92,33 +92,17 @@ export const getSettings = async (): Promise<Settings> => {
 
     validateSettings(json);
 
-    if (json.exclude_channels && !json.include_channels) {
-      const settings: Settings = {
-        ...getDefaultSettings(),
-        post_channel: json.post_channel,
-        exclude_channels: json.exclude_channels.map((exclude) =>
-          new RegExp(exclude)
-        ),
-        include_channels: undefined,
-      };
-      return settings;
-    } else if (!json.exclude_channels && json.include_channels) {
-      const settings: Settings = {
-        ...getDefaultSettings(),
-        post_channel: json.post_channel,
-        exclude_channels: undefined,
-        include_channels: json.include_channels.map((include) =>
-          new RegExp(include)
-        ),
-      };
-      return settings;
-    } else {
-      const settings: Settings = {
-        ...getDefaultSettings(),
-        post_channel: json.post_channel,
-      };
-      return settings;
-    }
+    const settings: Settings = {
+      ...getDefaultSettings(),
+      ...json,
+      exclude_channels: json.exclude_channels?.map((exclude) =>
+        new RegExp(exclude)
+      ),
+      include_channels: json.include_channels?.map((include) =>
+        new RegExp(include)
+      ),
+    };
+    return settings;
   } catch (err) {
     console.error(err);
     throw err;
