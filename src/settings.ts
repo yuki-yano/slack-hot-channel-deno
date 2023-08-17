@@ -14,22 +14,7 @@ type SettingsJson = {
   include_channels?: Array<string>;
 };
 
-export type ExcludeOnly = {
-  exclude_channels: Array<RegExp>;
-  include_channels?: never;
-};
-
-export type IncludeOnly = {
-  exclude_channels?: never;
-  include_channels: Array<RegExp>;
-};
-
-export type NeitherIncludeNorExclude = {
-  exclude_channels?: never;
-  include_channels?: never;
-};
-
-export type SettingsBase = {
+export type Settings = {
   post_channel: string;
   ranking_count: number;
   user_name: string;
@@ -39,11 +24,9 @@ export type SettingsBase = {
   ranking_sidewaytrend_emoji: string;
   ranking_uptrend_emoji: string;
   ranking_downtrend_emoji: string;
+  include_channels?: Array<RegExp>;
+  exclude_channels?: Array<RegExp>;
 };
-
-export type Settings =
-  & SettingsBase
-  & (ExcludeOnly | IncludeOnly | NeitherIncludeNorExclude);
 
 const DEFAULT_SETTINGS_FILE_NAME = "settings.json";
 
@@ -74,12 +57,6 @@ const validateSettings = (settings: SettingsJson): void => {
   if (!settings.post_channel) {
     throw new Error("Post channel is not defined in settings");
   }
-
-  if (settings.include_channels && settings.exclude_channels) {
-    throw new Error(
-      "Both include_channels and exclude_channels are defined in settings",
-    );
-  }
 };
 
 export const getSettings = async (): Promise<Settings> => {
@@ -92,33 +69,17 @@ export const getSettings = async (): Promise<Settings> => {
 
     validateSettings(json);
 
-    if (json.exclude_channels && !json.include_channels) {
-      const settings: Settings = {
-        ...getDefaultSettings(),
-        post_channel: json.post_channel,
-        exclude_channels: json.exclude_channels.map((exclude) =>
-          new RegExp(exclude)
-        ),
-        include_channels: undefined,
-      };
-      return settings;
-    } else if (!json.exclude_channels && json.include_channels) {
-      const settings: Settings = {
-        ...getDefaultSettings(),
-        post_channel: json.post_channel,
-        exclude_channels: undefined,
-        include_channels: json.include_channels.map((include) =>
-          new RegExp(include)
-        ),
-      };
-      return settings;
-    } else {
-      const settings: Settings = {
-        ...getDefaultSettings(),
-        post_channel: json.post_channel,
-      };
-      return settings;
-    }
+    const settings: Settings = {
+      ...getDefaultSettings(),
+      ...json,
+      exclude_channels: json.exclude_channels?.map((exclude) =>
+        new RegExp(exclude)
+      ),
+      include_channels: json.include_channels?.map((include) =>
+        new RegExp(include)
+      ),
+    };
+    return settings;
   } catch (err) {
     console.error(err);
     throw err;

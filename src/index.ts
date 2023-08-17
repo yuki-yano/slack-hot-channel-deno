@@ -16,20 +16,22 @@ import { fetchChannels, getData, postMessage } from "./slack/index.ts";
 import type { Ranking, RankingDiff } from "./type/data.ts";
 import { Channel } from "./type/slack.ts";
 
-const getChannels = async (settings: Settings): Promise<Array<Channel>> => {
-  const channels = await fetchChannels();
+const getChannels = async (
+  { include_channels, exclude_channels }: Settings,
+): Promise<Array<Channel>> => {
+  let channels = await fetchChannels();
 
-  if (settings.exclude_channels) {
-    return channels.filter((channel) =>
-      !settings.exclude_channels.some((exclude) => exclude.test(channel.name))
+  if (include_channels) {
+    channels = channels.filter((channel) =>
+      include_channels.some((include) => include.test(channel.name))
     );
-  } else if (settings.include_channels) {
-    return channels.filter((channel) =>
-      settings.include_channels.some((include) => include.test(channel.name))
-    );
-  } else {
-    return channels;
   }
+  if (exclude_channels) {
+    channels = channels.filter((channel) =>
+      !exclude_channels.some((exclude) => exclude.test(channel.name))
+    );
+  }
+  return channels;
 };
 
 const main = async (): Promise<void> => {
