@@ -1,4 +1,4 @@
-import { parse } from "./deps.ts";
+import { parseArgs } from "jsr:@std/cli@1.0.4/parse-args";
 
 type SettingsJson = {
   post_channel: string;
@@ -61,7 +61,7 @@ const validateSettings = (settings: SettingsJson): void => {
 
 export const getSettings = async (): Promise<Settings> => {
   try {
-    const file = parse(Deno.args)["settings"] ?? DEFAULT_SETTINGS_FILE_NAME;
+    const file = parseArgs(Deno.args)["settings"] ?? DEFAULT_SETTINGS_FILE_NAME;
     const data = await import(Deno.realPathSync(file), {
       with: { type: "json" },
     });
