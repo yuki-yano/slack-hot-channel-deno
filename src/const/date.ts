@@ -1,4 +1,4 @@
-import { moment } from "../deps.ts";
+import moment from "npm:moment@2.29.1";
 import { getDefaultSettings, getSettings } from "../settings.ts";
 
 const getMoment = async () => {

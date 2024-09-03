@@ -4,7 +4,7 @@ import {
   DEFAULT_HISTORY_OPTIONS,
   DEFAULT_POST_OPTIONS,
 } from "../const/slack.ts";
-import { delay } from "../deps.ts";
+import { delay } from "jsr:@std/async@1.0.4";
 import { Settings } from "../settings.ts";
 import type { AggregatedData } from "../type/data.ts";
 import type {
