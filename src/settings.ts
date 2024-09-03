@@ -63,7 +63,7 @@ export const getSettings = async (): Promise<Settings> => {
   try {
     const file = parse(Deno.args)["settings"] ?? DEFAULT_SETTINGS_FILE_NAME;
     const data = await import(Deno.realPathSync(file), {
-      assert: { type: "json" },
+      with: { type: "json" },
     });
     const json = data.default as SettingsJson;
 
